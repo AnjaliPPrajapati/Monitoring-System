@@ -1,0 +1,91 @@
+# --------------------------------------------------- FOR LOCAL USE --------------------------------------------------
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+common:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  replication_factor: 1
+  path_prefix: /tmp/loki
+
+schema_config:
+  configs:
+  - from: 2020-05-15
+    store: tsdb
+    object_store: filesystem
+    schema: v13
+    index:
+      prefix: index_
+      period: 24h
+
+storage_config:
+  filesystem:
+    directory: /tmp/loki/chunks
+
+
+# -----------------------------FOR PRODUCTION USE (Along with some extra parameters and S3 bucket configuration)---------------------------------------
+
+# auth_enabled: false
+
+# # log_level : info
+
+# server:
+#   http_listen_port: 3100
+#   grpc_listen_port: 9096
+#   http_server_read_timeout: 600s
+
+# analytics:
+#   reporting_enabled: false
+
+# common:
+#   path_prefix: /var/lib/loki/
+#   replication_factor: 1
+#   ring:
+#     kvstore:
+#       store: inmemory
+
+# storage_config:
+#   aws:
+#     s3: s3://ap-south-1
+#     bucketnames: bucketname
+
+#   tsdb_shipper:
+#     active_index_directory: /var/lib/loki/tsdb-index
+#     cache_location: /var/lib/loki/tsdb-cache
+#     cache_ttl: 300s
+
+# schema_config:
+#   configs:
+#     - from: 2024-04-16
+#       store: tsdb
+#       object_store: aws
+#       schema: v13
+#       index:
+#         prefix: index_
+#         period: 24h
+        
+# ingester:
+#   chunk_retain_period: 300s # How long chunks should be retained in-memory after they've been flushed.
+#   chunk_idle_period: 300s # How long chunks should sit in-memory with no updates before being flushed if they don't hit the max block size. This means that half-empty chunks will still be flushed after a certain period as long as they receive no further activity.
+#   max_chunk_age : 300s   #The maximum duration of a timeseries chunk in memory. If a timeseries runs for longer than this, the current chunk will be flushed to the store and a new chunk created.
+#   chunk_encoding: gzip
+#   chunk_target_size: 102400 # 100 MB 
+#   wal:
+#     flush_on_shutdown: true
+
+# compactor:
+#   working_directory: /var/lib/loki/retention
+#   # compaction_interval: 5m # default is 10m
+#   retention_enabled: true
+#   retention_delete_delay: 2h
+#   delete_request_store: aws      
+
+# limits_config:
+#   split_queries_by_interval: 0
+#   max_query_length : 0h
+#   retention_period: 2160h

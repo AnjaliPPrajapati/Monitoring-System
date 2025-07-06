@@ -1,0 +1,47 @@
+services:
+  loki-service:
+    user: root
+    image : grafana/loki
+    command: --config.file=/config_code/loki-local-config.yaml
+    container_name : 'loki'
+    ports: 
+      - "3100:3100"
+    # network_mode: "host"  
+    # restart: unless-stopped
+    volumes:
+    - .:/config_code
+    - ./loki-wal:/var/lib/lokiwal  #  /var/lib/loki
+    - ./loki_index_data:/var/lib/lokitsdb-index
+    - ./retention:/var/lib/lokiretention
+    logging:
+      driver: "json-file" # to ensure container logs are captured in JSON file
+      options:
+        max-size: "50000K" # 50 MB max JSON log file
+        max-file: "5" # Max 5 JSON log files of 50 MB each
+    deploy:
+      resources:
+        limits: # limited resources should be used, use this to avoid excess use of resources
+          cpus: '1'
+          memory: 512M
+
+  grafana-service:
+    user: root
+    image : grafana/grafana
+    ports: 
+      - "3000:3000"
+    # restart: unless-stopped
+    container_name : grafana
+    # network_mode: "host"
+    volumes:
+    - ./grafana:/var/lib/grafana
+    logging:
+      driver: "json-file" # to ensure container logs are captured in JSON file
+      options:
+        max-size: "50000K" # 50 MB max JSON log file
+        max-file: "5" # Max 5 JSON log files of 50 MB each
+    deploy:
+      resources:
+        limits: # limited resources should be used, use this to avoid excess use of resources
+          cpus: '1'
+          memory: 512M
+        
